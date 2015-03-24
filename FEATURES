@@ -1,0 +1,15 @@
+Export headers:
+	EXPORT_INCLUDE("Potato.hpp")
+
+Export functions:
+	EXPORT void Foo() {
+	}
+
+Export anything else:
+	HEADER(class Foo {
+	});
+
+	EXPORT_AS_CLASS(
+		Video {
+		};
+	);

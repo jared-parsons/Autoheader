@@ -1,5 +1,7 @@
 #include "Tokenizer.hpp"
 #include <stdexcept>
+#include <unistd.h>
+#include <fstream>
 
 namespace {
 	void ParseExportInclude(Tokenizer &tokenizer, std::ostream &output) {
@@ -66,13 +68,35 @@ namespace {
 		}
 	}
 
-	void ParseFile(std::istream &input, std::ostream &output) {
+	std::string GenerateGuardName(std::string outputFilename) {
+		std::string result = "GUARD_";
+		for (char character : outputFilename) {
+			if ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9')) {
+				result.push_back(character);
+			} else {
+				result += "_" + std::to_string(static_cast<std::uint32_t>(character));
+			}
+		}
+		return result;
+	}
+
+	void PrintOpeningHeaderGuard(std::ostream &output, const std::string &guard) {
+		output << "#ifndef " << guard << "\n";
+		output << "#define " << guard << "\n";
+	}
+
+	void PrintClosingHeaderGuard(std::ostream &output) {
+		output << "#endif\n";
+	}
+
+	void ParseFile(std::istream &input, std::ostream &output, const std::string &guard) {
+		PrintOpeningHeaderGuard(output, guard);
 		Tokenizer tokenizer(input);
 
 		for (;;) {
 			Maybe<Token> maybeToken = ReadToken(tokenizer);
 			if (!maybeToken.HasValue())
-				return;
+				break;
 			const Token token = std::move(maybeToken.GetValue());
 			if (GetType(token) == TokenType::Identifier) {
 				if (GetValue(token) == "EXPORT_INCLUDE") {
@@ -84,10 +108,47 @@ namespace {
 				}
 			}
 		}
+
+		PrintClosingHeaderGuard(output);
 	}
 }
 
-int main() {
-	ParseFile(std::cin, std::cout);
+int main(int argc, char * const argv[]) {
+	std::string guard;
+	bool guardSet = false;
+	std::string outputFilename;
+	bool outputFilenameSet = false;
+
+	int option;
+	while ((option = getopt(argc, argv, "o:g:")) != -1) {
+		switch (option) {
+			case 'o':
+				// thang : check outputFileSet?
+				outputFilename = optarg;
+				outputFilenameSet = true;
+				break;
+			case 'g':
+				// thang : check guardSet?
+				guard = optarg;
+				guardSet = true;
+				break;
+		}
+	}
+
+	if (!guardSet) {
+		if (outputFilenameSet) {
+			guard = GenerateGuardName(outputFilename);
+		} else {
+			std::cerr << "If no output file is specified (-o), then a guard name must be set (-g).\n";
+			return 1;
+		}
+	}
+
+	std::ofstream outputFile;
+	if (outputFilenameSet) {
+		outputFile.open(outputFilename); // thang : error check?
+	}
+	std::ostream &output = outputFilenameSet ? outputFile : std::cout;
+	ParseFile(std::cin, output, guard);
 	return 0;
 }

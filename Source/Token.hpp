@@ -40,4 +40,9 @@ inline const std::string &GetValue(const Token &token) {
 	return token._value;
 }
 
+inline std::ostream &operator<<(std::ostream &output, const Token &token) {
+	output << token._precedingWhitespace << token._value;
+	return output;
+}
+
 #endif

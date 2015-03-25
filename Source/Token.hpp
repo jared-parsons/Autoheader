@@ -1,8 +1,7 @@
-#ifndef GUARD_Token_hpp
-#define GUARD_Token_hpp
-
-#include <string>
-
+#ifndef AUTOHEADER_GUARD_Source_47Token_46hpp
+#define AUTOHEADER_GUARD_Source_47Token_46hpp
+#include "AutoHeader.hpp"
+#include "string"
 enum class TokenType {
 	Unknown,
 	Identifier,
@@ -13,8 +12,12 @@ enum class TokenType {
 	RightParenthesis,
 	StringLiteral,
 };
-
-struct Token final { // thang : class not struct
+#ifdef AUTOHEADER_BREAK_ENCAPSULATION_Source_47Token_46hpp
+struct
+#else
+class
+#endif
+Token final {
 	TokenType _type;
 	std::string _precedingWhitespace;
 	std::string _value;
@@ -22,27 +25,8 @@ struct Token final { // thang : class not struct
 public:
 	explicit Token(TokenType type, std::string precedingWhitespace, std::string value);
 	explicit Token(TokenType type, std::string precedingWhitespace, int character);
-
-/*	std::string GetPrecedingWhitespace() const {
-		return _precedingWhitespace;
-	}
-
-	void Print(std::ostream &output) const {
-		output << _precedingWhitespace << _value;
-	}*/
 };
-
-inline TokenType GetType(const Token &token) {
-	return token._type;
-}
-
-inline const std::string &GetValue(const Token &token) {
-	return token._value;
-}
-
-inline std::ostream &operator<<(std::ostream &output, const Token &token) {
-	output << token._precedingWhitespace << token._value;
-	return output;
-}
-
+TokenType GetType(const Token &token);
+const std::string &GetValue(const Token &token);
+std::ostream &operator<<(std::ostream &output, const Token &token);
 #endif

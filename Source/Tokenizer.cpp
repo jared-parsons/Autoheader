@@ -1,5 +1,18 @@
+#define AUTOHEADER_BREAK_ENCAPSULATION_Source_47Tokenizer_46hpp
 #include "Tokenizer.hpp"
 #include <stdexcept>
+EXPORT_INCLUDE("Maybe.hpp")
+EXPORT_INCLUDE("iostream")
+EXPORT_INCLUDE("Token.hpp")
+
+EXPORT_AS_CLASS(
+Tokenizer final { // thang : class not struct
+	std::istream &_input; // If you change this, make the class NoCopy.
+
+public:
+	explicit Tokenizer(std::istream &input);
+};
+)
 
 Tokenizer::Tokenizer(std::istream &input)
 	: _input(input)
@@ -53,7 +66,7 @@ namespace {
 	}
 }
 
-Maybe<Token> ReadToken(Tokenizer &tokenizer) {
+EXPORT Maybe<Token> ReadToken(Tokenizer &tokenizer) {
 	std::string precedingWhitespace;
 	for (;;) {
 		int character = tokenizer._input.get();
@@ -72,7 +85,7 @@ Maybe<Token> ReadToken(Tokenizer &tokenizer) {
 			case ')':
 				return Token(TokenType::RightParenthesis, precedingWhitespace, character);
 			case '\'':
-				return ReadStringLiteral(tokenizer._input, TokenType::Unknown, '"', precedingWhitespace);
+				return ReadStringLiteral(tokenizer._input, TokenType::Unknown, '\'', precedingWhitespace);
 			case '"':
 				return ReadStringLiteral(tokenizer._input, TokenType::StringLiteral, '"', precedingWhitespace);
 			default:
@@ -99,14 +112,14 @@ Maybe<Token> ReadToken(Tokenizer &tokenizer) {
 	}
 }
 
-Token ReadRequiredToken(Tokenizer &tokenizer) {
+EXPORT Token ReadRequiredToken(Tokenizer &tokenizer) {
 	Maybe<Token> maybeToken = ReadToken(tokenizer);
 	if (!maybeToken.HasValue())
 		throw std::runtime_error("Required token was not found.");
 	return maybeToken.GetValue();
 }
 
-Token ReadRequiredToken(Tokenizer &tokenizer, TokenType type) {
+EXPORT Token ReadRequiredToken(Tokenizer &tokenizer, TokenType type) {
 	Token result = ReadRequiredToken(tokenizer);
 	if (GetType(result) != type)
 		throw std::runtime_error("Required token is of the wrong type.");

@@ -107,6 +107,7 @@ namespace {
 
 	void ParseFile(std::istream &input, std::ostream &output, const std::string &guard, const Maybe<std::string> &encapsulationBreaker) {
 		PrintOpeningHeaderGuard(output, guard);
+		output << "#include \"AutoHeader.hpp\"\n";
 		Tokenizer tokenizer(input);
 
 		for (;;) {

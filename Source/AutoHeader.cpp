@@ -165,6 +165,21 @@ int main(int argc, char * const argv[]) {
 			}
 		}
 
+		// Setup input file.
+		bool inputFilenameSet = false;
+		if (optind < argc) {
+			if (argc - optind > 1) {
+				std::cerr << "Autoheader takes at most one argument.\n";
+				return 1;
+			}
+			inputFilenameSet = true;
+		}
+		std::ifstream inputFile;
+		if (inputFilenameSet) {
+			inputFile.open(argv[optind]); // thang : error check?
+		}
+		std::istream &input = inputFilenameSet ? inputFile : std::cin;
+
 		// Setup output file.
 		std::ofstream outputFile;
 		if (outputFilenameSet) {
@@ -179,7 +194,7 @@ int main(int argc, char * const argv[]) {
 		}
 
 		// And go..
-		ParseFile(std::cin, output, guard, encapsulationBreaker);
+		ParseFile(input, output, guard, encapsulationBreaker);
 	} catch (std::exception &exception) {
 		std::cerr << "ERROR: " << exception.what() << "\n";
 		return 1;
